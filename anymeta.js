@@ -1,4 +1,4 @@
-var AnyMeta= {};
+var AnyMeta = {};
 
 AnyMeta.sites = {};
 // simply add sites you want to support in the following format
@@ -45,6 +45,7 @@ AnyMeta.register = function register(site, callback, errback) {
                         token: OAuth.getParameter(results, "oauth_token"),
                         tokenSecret: OAuth.getParameter(results, "oauth_token_secret")
                     });
+                    // 3. exchange request token for access token
                     var requestAccess = new XMLHttpRequest();
                     requestAccess.onreadystatechange = function receiveAccessToken() {
                         if (requestAccess.readyState == 4) {
@@ -100,7 +101,6 @@ AnyMeta.request = function request(method, site, auth_tokens, apiMethod, paramet
                 // var results = OAuth.decodeForm(requestToken.responseText);
                 var results = JSON.parse(requestToken.responseText);
                 if (results) {
-                    // console.log(requestToken.responseText);
                     callback(results);
                 } else {
                     errback(requestToken);
