@@ -1,0 +1,66 @@
+<html>
+	<head>
+		<title>AnyMeta OAuth Test</title>
+		<script type="text/javascript" src="sha1.js"></script>
+		<script type="text/javascript" src="oauth.js"></script>
+		<script type="text/javascript" src="anymeta.js"></script>
+		
+		<script type="text/javascript">
+    		// a helper function to append an unordered list of the given object's keys and values to the provided DOM element
+    		function listObject(obj, appendMe) {
+        		var ul = document.createElement('ul');
+        		for (var k in obj) {
+            		if (obj[k] instanceof Object && !(obj[k] instanceof String)) {
+                		var li = document.createElement('li');
+                		li.innerHTML = k + ':';
+                		ul.appendChild(li);
+                		listObject(obj[k], ul);
+            		} else {
+                		var li = document.createElement('li');
+                		li.innerHTML = k + ': ' + obj[k];
+                		ul.appendChild(li);
+            		}
+        		}
+        		appendMe.appendChild(ul);
+    		}
+    		
+    		// see if we already have the tokens stored
+    		var auth_token = localStorage.getItem('oauth_token');
+    		var auth_token_secret = localStorage.getItem('oauth_token_secret');
+    		// getItem returns null if the key does not exist, so check that we have both values
+    		if (auth_token && auth_token_secret) {
+        		// a raw request with none of the nice wrapping that will be done eventually
+        		AnyMeta.request(
+            		'GET',               // the HTTP request method
+            		'mediamatic.net',    // the server in AnyMeta.servers to use
+            		{'oauth_token': auth_token, 'oauth_token_secret': auth_token_secret},
+            		'anymeta.user.info', // the AnyMeta API method
+            		[],                  // query parameters in the [[key, value], [key, value]] format oauth.js likes
+            		[],                  // request body, again in the same format
+            		function(person) {   // the success callback
+                		var h1 = document.createElement('h1');
+                		h1.innerHTML = 'Welcome <a href="http://www.mediamatic.net/person/' + person.id + '/en">' + person.title + '</a>!';
+                		document.body.appendChild(h1);
+                        listObject(person, document.body);
+            		},
+            		function() { console.log('error'); } // the error callback (errback)
+        		);
+    		} else {
+        		// try to register for the following server with callback and errback
+        		AnyMeta.register(
+            		'mediamatic.net',
+            		function(tokens) {
+                		localStorage.setItem('oauth_token', tokens['oauth_token']);
+                		localStorage.setItem('oauth_token_secret', tokens['oauth_token_secret']);
+            		},
+            		function (badRequest) {
+                		console.log('failed');
+            		}
+        		);
+    		}
+		</script>
+		
+	</head>
+	<body>
+	</body>
+</html>
