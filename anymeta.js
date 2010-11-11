@@ -17,11 +17,6 @@ AnyMeta.sites['mediamatic.net'] = {
     }
 }
 
-AnyMeta.callback = function callback(result) {
-    console.log('Callback firing at', (new Date()).getTime());
-    console.log('received:', result);
-}
-
 AnyMeta.register = function register(site, callback, errback) {
     var accessor = AnyMeta.sites[site];
     var message = {
