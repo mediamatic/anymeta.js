@@ -24,43 +24,64 @@
         		appendMe.appendChild(ul);
     		}
     		
-    		// see if we already have the tokens stored
-    		var auth_token = localStorage.getItem('oauth_token');
-    		var auth_token_secret = localStorage.getItem('oauth_token_secret');
-    		// getItem returns null if the key does not exist, so check that we have both values
-    		if (auth_token && auth_token_secret) {
-        		// a raw request with none of the nice wrapping that will be done eventually
-        		AnyMeta.request(
-            		'GET',               // the HTTP request method
-            		'mediamatic.net',    // the server in AnyMeta.servers to use
-            		{'oauth_token': auth_token, 'oauth_token_secret': auth_token_secret},
-            		'anymeta.user.info', // the AnyMeta API method
-            		[],                  // query parameters in the [[key, value], [key, value]] format oauth.js likes
-            		[],                  // request body, again in the same format
-            		function(person) {   // the success callback
-                		var h1 = document.createElement('h1');
-                		h1.innerHTML = 'Welcome <a href="http://www.mediamatic.net/person/' + person.id + '/en">' + person.title + '</a>!';
-                		document.body.appendChild(h1);
-                        listObject(person, document.body);
-            		},
-            		function() { console.log('error'); } // the error callback (errback)
-        		);
-    		} else {
-        		// try to register for the following server with callback and errback
-        		AnyMeta.register(
-            		'mediamatic.net',
-            		function(tokens) {
-                		localStorage.setItem('oauth_token', tokens['oauth_token']);
-                		localStorage.setItem('oauth_token_secret', tokens['oauth_token_secret']);
-            		},
-            		function (badRequest) {
-                		console.log('failed');
-            		}
-        		);
+    		function onLoad() {	
+        		// see if we already have the tokens stored
+        		AnyMeta.currentSite = 'mediamatic.net';
+        		var auth_token = localStorage.getItem(AnyMeta.currentSite + '.oauth_token');
+        		var auth_token_secret = localStorage.getItem(AnyMeta.currentSite + '.oauth_token_secret');
+        		// getItem returns null if the key does not exist, so check that we have both values
+        		if (auth_token && auth_token_secret) {
+            		AnyMeta.setTokens(auth_token, auth_token_secret);
+            		AnyMeta.user.info(
+                		[],
+                		function (person) {   // the success callback
+                    		var h1 = document.createElement('h1');
+                    		h1.innerHTML = 'Welcome <a href="http://www.mediamatic.net/person/' + person.id + '/en">' + person.title + '</a>!';
+                    		document.body.appendChild(h1);
+                            listObject(person, document.body);
+                		}
+            		);
+        		} else {
+            		// try to register for the following server with callback and errback
+            		AnyMeta.register(
+                		AnyMeta.currentSite,
+                		// once the system is ready to hand off to us to have the user authorize us on the AnyMeta site in question
+                		// url is the url the user should visit to authorize us
+                		// callback is the function we should call once the user says they have successfully authorized us
+                		// it should be called with a callback and errback
+                		// there is no errback as the library doesn't need to do anything on to authorize
+                		function (url, callback) {
+                    		alert("Please go to " + url + '\nWhen done click ok.');
+                    		callback(
+                        		function (tokens) {
+                            		// persist for later (don't use cookies because they'll get passed around and in plain text)
+                            		localStorage.setItem(AnyMeta.currentSite + '.oauth_token', tokens['oauth_token']);
+                            		localStorage.setItem(AnyMeta.currentSite + '.oauth_token_secret', tokens['oauth_token_secret']);
+                            		AnyMeta.setTokens(tokens['oauth_token'], tokens['oauth_token_secret']);
+                            		AnyMeta.user.info(
+                                		[],
+                                		function (person) {   // the success callback
+                                    		var h1 = document.createElement('h1');
+                                    		h1.innerHTML = 'Welcome <a href="http://www.mediamatic.net/person/' + person.id + '/en">' + person.title + '</a>!';
+                                    		document.body.appendChild(h1);
+                                            listObject(person, document.body);
+                                		}
+                            		);
+                        		},
+                        		function (badRequest) {
+                            		console.log('Failed to get an access token.');
+                        		}
+                    		);
+                		},
+                		function (badRequest) {
+                    		console.log('Failed to get a request token.');
+                		}
+            		);
+        		}
     		}
 		</script>
 		
 	</head>
-	<body>
+	<body onload="onLoad()">
 	</body>
 </html>
