@@ -107,33 +107,54 @@ AnyMeta.request = function request(method, site, authTokens, apiMethod, paramete
     var accessor = AnyMeta.sites[site];
     accessor['token'] = authTokens['oauth_token'];
     accessor['tokenSecret'] = authTokens['oauth_token_secret'];
-    var message = {
-        action: OAuth.addToURL(AnyMeta.sites[site].apiEndpoint, parameters),
-        method: method,
-        parameters: body,
-    };
     
-    var requestBody = OAuth.formEncode(message.parameters);
+    if (method == 'GET') {
+        var message = {
+            action: OAuth.addToURL(AnyMeta.sites[site].apiEndpoint, parameters),
+            method: method,
+            parameters: [],
+        };
+    } else if (method = 'POST') {
+        var allvals = body;
+        for (var k in parameters) {
+            allvals.push(parameters[k]);
+        }
+        var message = {
+            action: AnyMeta.sites[site].apiEndpoint,
+            method: method,
+            parameters: allvals,
+        }
+    }
+    
     OAuth.completeRequest(message, accessor);
+    
+    if (method == 'POST') {    
+        // put absolutely everything, including the OAuth signature information, in the request body
+        //   AnyMeta seems to require this despite it not being part of the OAuth standard
+        var requestBody = OAuth.formEncode(allvals);
+    } else {
+        var requestBody = OAuth.formEncode([]);
+    }
+    
     var authorizationHeader = OAuth.getAuthorizationHeader("", message.parameters);
-    var requestToken = new XMLHttpRequest();
-    requestToken.onreadystatechange = function receiveRequestToken() {
-        if (requestToken.readyState == 4) {
-            if (requestToken.responseText) {
-                // var results = OAuth.decodeForm(requestToken.responseText);
-                var results = JSON.parse(requestToken.responseText);
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = function receiveRequestToken() {
+        if (request.readyState == 4) {
+            if (request.responseText) {
+                var results = JSON.parse(request.responseText);
+                // FIXME: we can have a 200 response but still an error, since we'll get an object back with an error key. Pass that to the errback.
                 if (results) {
                     callback(results);
                 } else {
-                    errback(requestToken);
+                    errback(request);
                 }
             }
         }
     };
-    requestToken.open(message.method, message.action, true); 
-    requestToken.setRequestHeader("Authorization", authorizationHeader);
-    requestToken.setRequestHeader("Content-Type", "application/json");
-    requestToken.send(requestBody);
+    request.open(message.method, message.action, true); 
+    request.setRequestHeader("Authorization", authorizationHeader);
+    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    request.send(requestBody);
 }
 
 AnyMeta.wrappedRequest = function wrappedRequest(method, apiMethod, parameters, body, callback, errback) {
