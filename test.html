@@ -33,18 +33,26 @@
         		if (auth_token && auth_token_secret) {
             		AnyMeta.setTokens(auth_token, auth_token_secret);
             		AnyMeta.user.info(
-                		[],
                 		function (person) {   // the success callback
                     		var h1 = document.createElement('h1');
                     		h1.innerHTML = 'Welcome <a href="http://www.mediamatic.net/person/' + person.id + '/en">' + person.title + '</a>!';
                     		document.body.appendChild(h1);
                             listObject(person, document.body);
+                            AnyMeta.user.create(
+                                'The Foundry',
+                                'thefoundry@bubblefoundry.com',
+                                function (result) {
+                                    var h1 = document.createElement('h1');
+                            		h1.innerHTML = 'Created a new user!';
+                            		document.body.appendChild(h1);
+                                    listObject(result, document.body);
+                                }
+                            );
                 		}
             		);
         		} else {
             		// try to register for the following server with callback and errback
             		AnyMeta.register(
-                		AnyMeta.currentSite,
                 		// once the system is ready to hand off to us to have the user authorize us on the AnyMeta site in question
                 		// url is the url the user should visit to authorize us
                 		// callback is the function we should call once the user says they have successfully authorized us
@@ -59,7 +67,6 @@
                             		localStorage.setItem(AnyMeta.currentSite + '.oauth_token_secret', tokens['oauth_token_secret']);
                             		AnyMeta.setTokens(tokens['oauth_token'], tokens['oauth_token_secret']);
                             		AnyMeta.user.info(
-                                		[],
                                 		function (person) {   // the success callback
                                     		var h1 = document.createElement('h1');
                                     		h1.innerHTML = 'Welcome <a href="http://www.mediamatic.net/person/' + person.id + '/en">' + person.title + '</a>!';
