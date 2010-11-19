@@ -1,4 +1,5 @@
 var AnyMeta = {};
+AnyMeta.apiVersion = 1;
 
 AnyMeta.sites = {};
 // simply add sites you want to support in the following format
