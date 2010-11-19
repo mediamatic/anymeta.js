@@ -174,15 +174,40 @@ AnyMeta.setTokens = function setTokens(token, tokenSecret) {
 AnyMeta.NOOP = function NOOP() {};
 
 AnyMeta.user = {};
-AnyMeta.user.info = function info(parameters, callback, errback) {
+AnyMeta.user.create = function create(fullname, email, enabled, confirm, password, sendconfirm, callback, errback) {
+    var body = [];
+    // fullname and email are required, so assume they're there
+    body.push(['fullname', fullname]);
+    body.push(['email', email]);
+    // just gave a callback
+    if (arguments.length == 3 && arguments[2] instanceof Function) {
+        callback = arguments[2];
+        errback = AnyMeta.NOOP;
+    }
+    // just gave callback and errback
+    else if (arguments.length == 4 && arguments[2] instanceof Function && arguments[3] instanceof Function) {
+        callback = arguments[2];
+        errback = arguments[3];
+    }
+    // else all body are assumed to have been given
+    else {
+        body.push(['enabled', enabled]);
+        body.push(['confirm', confirm]);
+        body.push(['password', password]);
+        body.push(['sendconfirm', sendconfirm]);
+    }
+    AnyMeta.wrappedRequest('POST', 'anymeta.user.create', [], body, callback, errback);
+}
+AnyMeta.user.info = function info(person_id, callback, errback) {
+    var parameters = [];
     // see if we got parameters and body or callback and errback
     if (arguments.length == 2) {
-        if (arguments[0] instanceof Function && arugments[1] instanceof Function) {
+        if (arguments[0] instanceof Function && arguments[1] instanceof Function) {
             parameters = [];
             callback = arguments[0];
             errback = arguments[1];
         } else {
-            // assume errback was omitted, add it
+            parameters.push(['person_id', person_id]);
             errback = AnyMeta.NOOP;
         }
     } else if (arguments.length == 1 && arguments[0] instanceof Function) {
@@ -190,6 +215,8 @@ AnyMeta.user.info = function info(parameters, callback, errback) {
         parameters = [];
         callback = arguments[0];
         errback = AnyMeta.NOOP;
+    } else {
+        parameters.push(['person_id', person_id]);
     }
     AnyMeta.wrappedRequest('GET', 'anymeta.user.info', parameters, [], callback, errback);
 }
