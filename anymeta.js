@@ -37,7 +37,7 @@ AnyMeta.register = function register(callback, errback) {
             if (requestToken.responseText) {
                 var results = OAuth.decodeForm(requestToken.responseText);
                 if (results) {
-                    var userAuthURL = accessor.serviceProvider.userAuthorizationURL + '&oauth_token=' + OAuth.getParameter(results, "oauth_token");
+                    var userAuthURL = accessor.serviceProvider.userAuthorizationURL + '?oauth_token=' + OAuth.getParameter(results, "oauth_token");
                     // 3. exchange request token for access token
                     var getAccessToken = function getAccessToken(callback2, errback2) {
                         message = {method: "POST", action: accessor.serviceProvider.accessTokenURL, parameters: []};
