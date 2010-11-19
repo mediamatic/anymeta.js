@@ -220,3 +220,66 @@ AnyMeta.user.info = function info(person_id, callback, errback) {
     }
     AnyMeta.wrappedRequest('GET', 'anymeta.user.info', parameters, [], callback, errback);
 }
+
+AnyMeta.thing = {};
+AnyMeta.thing.discover = function dump(resource_uri, callback, errback) {
+    if (arguments.length == 2) {
+        errback = AnyMeta.NOOP;
+    }
+    AnyMeta.wrappedRequest('GET', 'anymeta.thing.discover', [['uri', resource_uri]], [], callback, errback);
+}
+AnyMeta.thing.dump = function dump(thing_id, callback, errback) {
+    if (arguments.length == 2) {
+        errback = AnyMeta.NOOP;
+    }
+    AnyMeta.wrappedRequest('GET', 'anymeta.thing.dump', [['id', thing_id]], [], callback, errback);
+}
+AnyMeta.thing.duplicate = function dump(thing_id, callback, errback) {
+    if (arguments.length == 2) {
+        errback = AnyMeta.NOOP;
+    }
+    AnyMeta.wrappedRequest('POST', 'anymeta.thing.duplicate', [['thing_id', thing_id]], [], callback, errback);
+}
+
+AnyMeta.predicates = {};
+// fields must be an array in the format ['field']
+// FIXME: multiple fields don't work
+/*
+    AnyMeta.predicates.get(
+        '55',
+        'text.title',
+        function (thing) {
+            var h1 = document.createElement('h1');
+            h1.innerHTML = 'anymeta.predicates.get';
+            document.body.appendChild(h1);
+            listObject(thing, document.body);
+        }
+    );
+*/
+AnyMeta.predicates.get = function get(thing_id, fields, lang, wikify, callback, errback) {
+    // assume id is always given
+    var parameters = [['id', thing_id]];
+    // fields are also required
+    if (!(fields instanceof Array)) {
+        fields = [fields];
+    }
+    for (var k in fields) {
+        parameters.push(['field', fields[k]]); // not sure this is how the method takes an array of fields...
+    }
+    // just gave a callback
+    if (arguments.length == 3 && arguments[2] instanceof Function) {
+        callback = arguments[2];
+        errback = AnyMeta.NOOP;
+    }
+    // just gave callback and errback
+    else if (arguments.length == 4 && arguments[2] instanceof Function && arguments[3] instanceof Function) {
+        callback = arguments[2];
+        errback = arguments[3];
+    }
+    // else all parameters are assumed to have been given
+    else {
+        parameters.push(['lang', lang]);
+        parameters.push(['wikify', wikify]);
+    }
+    AnyMeta.wrappedRequest('GET', 'anymeta.predicates.get', parameters, [], callback, errback);
+}
