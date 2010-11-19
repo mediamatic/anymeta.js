@@ -19,8 +19,8 @@ AnyMeta.sites['mediamatic.net'] = {
 }
 AnyMeta.currentSite = null;
 
-AnyMeta.register = function register(site, callback, errback) {
-    var accessor = AnyMeta.sites[site];
+AnyMeta.register = function register(callback, errback) {
+    var accessor = AnyMeta.sites[AnyMeta.currentSite];
     var message = {
         action: accessor.serviceProvider.requestTokenURL,
         method: 'POST',
