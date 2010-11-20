@@ -268,7 +268,7 @@ AnyMeta.predicates.get = function get(thing_id, fields, lang, wikify, callback, 
         fields = [fields];
     }
     for (var k in fields) {
-        parameters.push(['field', fields[k]]); // not sure this is how the method takes an array of fields...
+        parameters.push(['field[' + k + ']', fields[k]]); // not sure this is how the method takes an array of fields...
     }
     // just gave a callback
     if (arguments.length == 3 && arguments[2] instanceof Function) {

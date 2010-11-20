@@ -38,6 +38,7 @@
                     		h1.innerHTML = 'Welcome <a href="http://www.mediamatic.net/person/' + person.id + '/en">' + person.title + '</a>!';
                     		document.body.appendChild(h1);
                             listObject(person, document.body);
+/*
                             AnyMeta.user.create(
                                 'The Foundry',
                                 'thefoundry@bubblefoundry.com',
@@ -46,6 +47,20 @@
                             		h1.innerHTML = 'Created a new user!';
                             		document.body.appendChild(h1);
                                     listObject(result, document.body);
+                                }
+                            );
+*/
+                            AnyMeta.predicates.get(
+                                'MEDIAMATIC',
+                                ['text.title', 'text.body'],
+                                function (thing) {
+                                    var h1 = document.createElement('h1');
+                                    h1.innerHTML = 'anymeta.predicates.get';
+                                    document.body.appendChild(h1);
+                                    listObject(thing, document.body);
+                                },
+                                function (err) {
+                                    console.log('error! ' + err.responseText.toString());
                                 }
                             );
                 		}
