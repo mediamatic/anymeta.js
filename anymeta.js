@@ -141,11 +141,15 @@ AnyMeta.request = function request(method, site, authTokens, apiMethod, paramete
     request.onreadystatechange = function receiveRequestToken() {
         if (request.readyState == 4) {
             if (request.responseText) {
-                var results = JSON.parse(request.responseText);
-                // FIXME: we can have a 200 response but still an error, since we'll get an object back with an error key. Pass that to the errback.
-                if (results) {
-                    callback(results);
-                } else {
+                try {
+                    var results = JSON.parse(request.responseText);
+                    // if we didn't get an error object
+                    if (!('error' in results)) {
+                        callback(results);
+                    } else {
+                        errback(results);
+                    }
+                } catch (e) {
                     errback(request);
                 }
             }
