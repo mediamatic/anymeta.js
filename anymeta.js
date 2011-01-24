@@ -347,3 +347,46 @@ AnyMeta.predicates.set = function set(thing_id, field, value, lang, name, callba
   AnyMeta.wrappedRequest('POST', 'anymeta.predicates.set', parameters, [], callback, errback);
 }
 
+AnyMeta.attachment = {};
+AnyMeta.attachment.create = function create(data, mime, title, connect, modifier_id, callback, errback) {
+  var parameters = [['data', data], ['mime', mime]];
+  if (arguments.length == 3 && arguments[2] instanceof Function) {
+    callback = arguments[2];
+    errback = AnyMeta.NOOP;
+  }
+  else if (arguments.length == 4 && arguments[2] instanceof Function && arguments[3] instanceof Function) {
+    callback = arguments[2];
+    errback = arguments[3];
+  }
+  else if (arguments.length == 4 && arguments[3] instanceof Function) {
+    parameters.push(['title', title]);
+    callback = arguments[3];
+    errback = AnyMeta.NOOP;
+  }
+  else if (arguments.length == 5 && arguments[3] instanceof Function && arguments[4] instanceof Function) {
+    parameters.push(['title', title]);
+    callback = arguments[3];
+    errback = arguments[4];
+  }
+  else if (arguments.length == 5 && arguments[4] instanceof Function) {
+    parameters.push(['title', title]);
+    parameters.push(['connect', connect]);
+    callback = arguments[4];
+    errback = AnyMeta.NOOP;
+  }
+  else if (arguments.length == 6 && arguments[4] instanceof Function && arguments[5] instanceof Function) {
+    parameters.push(['title', title]);
+    parameters.push(['connect', connect]);
+    callback = arguments[4];
+    errback = arguments[5];
+  }
+  // else all arguments are present
+  else {
+    parameters.push(['title', title]);
+    parameters.push(['connect', connect]);
+    parameters.push(['modifier_id', modifier_id]);
+  }
+  
+  AnyMeta.wrappedRequest('POST', 'anymeta.attachment.create', parameters, [], callback, errback);
+}
+
