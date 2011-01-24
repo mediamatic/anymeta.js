@@ -177,6 +177,32 @@ AnyMeta.setTokens = function setTokens(token, tokenSecret) {
 // NOOP function to replace undefined callback or errback functions
 AnyMeta.NOOP = function NOOP() {};
 
+// just preps a query function with the provided method
+AnyMeta.__prepManyParamMethod = function __prepManyParamMethod(method, apiMethod) {
+  // don't take all the parameters individually because there are so many of them
+  // conditions can either be a dictionary or the OAuth-friendly list
+  return function(conditions, callback, errback) {
+    if (conditions instanceof Array) {
+      var parameters = conditions;
+    }
+    // else assume it's an object
+    else {
+      var parameters = [];
+      for (var key in conditions) {
+        if (conditions.hasOwnProperty(key)) {
+          parameters.push([key, conditions[key]]);
+        }
+      }
+    }
+    
+    if (arguments.length == 3) {
+      errback = AnyMeta.NOOP;
+    }
+    
+    AnyMeta.wrappedRequest(method, apiMethod, parameters, [], callback, errback);
+  }
+}
+
 AnyMeta.user = {};
 AnyMeta.user.create = function create(fullname, email, enabled, confirm, password, sendconfirm, callback, errback) {
     var body = [];
@@ -389,4 +415,9 @@ AnyMeta.attachment.create = function create(data, mime, title, connect, modifier
   
   AnyMeta.wrappedRequest('POST', 'anymeta.attachment.create', parameters, [], callback, errback);
 }
+
+AnyMeta.query = {};
+// since the only difference between query.execute and query.search is the response formats, which we don't process, share a common base function
+AnyMeta.query.execute = AnyMeta.query.__prepManyParamMethod('GET', 'anymeta.query.execute');
+AnyMeta.query.search = AnyMeta.query.__prepManyParamMethod('GET', 'anymeta.query.search');
 
