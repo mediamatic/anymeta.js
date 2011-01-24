@@ -27,6 +27,7 @@
     		function onLoad() {	
         		// see if we already have the tokens stored
         		AnyMeta.currentSite = 'mediamatic.net';
+                // localStorage.clear();
         		var auth_token = localStorage.getItem(AnyMeta.currentSite + '.oauth_token');
         		var auth_token_secret = localStorage.getItem(AnyMeta.currentSite + '.oauth_token_secret');
         		// getItem returns null if the key does not exist, so check that we have both values
