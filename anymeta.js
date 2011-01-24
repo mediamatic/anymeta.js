@@ -328,3 +328,22 @@ AnyMeta.predicates.get = function get(thing_id, fields, lang, wikify, callback, 
     }
     AnyMeta.wrappedRequest('GET', 'anymeta.predicates.get', parameters, [], callback, errback);
 }
+AnyMeta.predicates.set = function set(thing_id, field, value, lang, name, callback, errback) {
+  var parameters = [['id', thing_id], ['field', field], ['value', value]];
+  if (arguments.length == 4 && arguments[3] instanceof Function) {
+    callback = arguments[3];
+    errback = AnyMeta.NOOP;
+  }
+  else if (arguments.length == 5 && arguments[3] instanceof Function && arguments[4] instanceof Function) {
+    callback = arguments[3];
+    errback = arguments[4];
+  }
+  // else assume all parameters are given
+  else {
+    parameters.push(['lang', lang]);
+    parameters.push(['name', name]);
+  }
+  
+  AnyMeta.wrappedRequest('POST', 'anymeta.predicates.set', parameters, [], callback, errback);
+}
+
