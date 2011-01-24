@@ -421,3 +421,33 @@ AnyMeta.query = {};
 AnyMeta.query.execute = AnyMeta.query.__prepManyParamMethod('GET', 'anymeta.query.execute');
 AnyMeta.query.search = AnyMeta.query.__prepManyParamMethod('GET', 'anymeta.query.search');
 
+AnyMeta.edge = {};
+AnyMeta.edge.add = AnyMeta.query.__prepManyParamMethod('POST', 'anymeta.edge.add');
+// NOTE: the edge or object + predicate is accessed via the arguments variable
+AnyMeta.edge.remove = function remove(thing_id, callback, errback) {
+  var parameters = [['id', thing_id]];
+  if (arguments.length == 3 && arguments[2] instanceof Function) {
+    parameters.push(['edge', arguments[1]]);
+    callback = arguments[2];
+    errback = AnyMeta.NOOP;
+  }
+  else if (arguments.length == 4 && arguments[2] instanceof Function && arguments[3] instanceof Function) {
+    parameters.push(['edge', arguments[1]]);
+    callback = arguments[2];
+    errback = arguments[3];
+  }
+  else if (arguments.length == 4 && arguments[3] instanceof Function) {
+    parameters.push(['object', arguments[1]]);
+    parameters.push(['predicate', arguments[2]]);
+    callback = arguments[3];
+    errback = AnyMeta.NOOP;
+  }
+  else if (arguments.length == 5 && arguments[3] instanceof Function && arguments[4] instanceof Function) {
+    parameters.push(['object', arguments[1]]);
+    parameters.push(['predicate', arguments[2]]);
+    callback = arguments[3];
+    errback = arguments[4];
+  }
+  
+  AnyMeta.wrappedRequest('POST', 'anymeta.edge.add', parameters, [], callback, errback);
+}
