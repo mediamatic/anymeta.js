@@ -244,6 +244,60 @@ AnyMeta.thing.duplicate = function dump(thing_id, callback, errback) {
     }
     AnyMeta.wrappedRequest('POST', 'anymeta.thing.duplicate', [['thing_id', thing_id]], [], callback, errback);
 }
+AnyMeta.thing.makeAuthoritative = function makeAuthoritative(thing_id, keep_subscription, callback, errback) {
+  if (arguments.length == 2 && arguments[1] instanceof Function) {
+    keep_subscription = false;
+    callback = arguments[1];
+    errback = AnyMeta.NOOP;
+  }
+  else if (arguments.length == 3 && arguments[1] instanceof Function && arguments[2] instanceof Function) {
+    keep_subscription = false;
+    callback = arguments[1];
+    errback = arguments[2];
+  }
+  else if (arguments.length == 3) {
+    errback = AnyMeta.NOOP;
+  }
+  AnyMeta.wrappedRequest('POST', 'anymeta.thing.makeAuthoritative', [['id', thing_id], ['keep_subscription', keep_subscription]], [], callback, errback);
+}
+AnyMeta.thing.makeNonAuthoritative = function makeNonAuthoritative(thing_id, resource_uri, callback, errback) {
+  if (arguments.length == 3) {
+    errback = AnyMeta.NOOP;
+  }
+  AnyMeta.wrappedRequest('POST', 'anymeta.thing.makeNonAuthoritative', [['id', thing_id], ['rsc_uri', resource_uri]], [], callback, errback);
+}
+AnyMeta.thing.insert = function insert(data, callback, errback) {
+  if (arguments.length == 2) {
+    errback = AnyMeta.NOOP;
+  }
+  AnyMeta.wrappedRequest('POST', 'anymeta.thing.insert', [['data', data]], [], callback, errback);
+}
+AnyMeta.thing.update = function update(thing_id, data, callback, errback) {
+  if (arguments.length == 3) {
+    errback = AnyMeta.NOOP;
+  }
+  AnyMeta.wrappedRequest('POST', 'anymeta.thing.update', [['thing_id', thing_id], ['data', data]], [], callback, errback);
+}
+// Have to use del instead of delete because otherwise the interpreter will detect the delete operator
+AnyMeta.thing.del = function del(thing_id, followup, secure, callback, errback) {
+  var parameters = [['thing_id', thing_id]];
+  if (arguments.length == 2 && arguments[1] instanceof Function) {
+    callback = arguments[1];
+    errback = AnyMeta.NOOP;
+  }
+  else if (arguments.length == 3 && arguments[1] instanceof Function && arguments[2] instanceof Function) {
+    callback = arguments[1];
+    errback = arguments[2];
+  }
+  // else all parameters are assumed to have been given
+  else {
+    parameters.push(['followup', followup]);
+    parameters.push(['secure', secure]);
+  }
+    
+  AnyMeta.wrappedRequest('POST', 'anymeta.things.delete', parameters, [], callback, errback);
+}
+
 
 AnyMeta.predicates = {};
 // fields must be an array in the format ['field']
