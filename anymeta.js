@@ -300,20 +300,7 @@ AnyMeta.thing.del = function del(thing_id, followup, secure, callback, errback) 
 
 
 AnyMeta.predicates = {};
-// fields must be an array in the format ['field']
-// FIXME: multiple fields don't work
-/*
-    AnyMeta.predicates.get(
-        '55',
-        'text.title',
-        function (thing) {
-            var h1 = document.createElement('h1');
-            h1.innerHTML = 'anymeta.predicates.get';
-            document.body.appendChild(h1);
-            listObject(thing, document.body);
-        }
-    );
-*/
+// fields must be an array in the format ['field1', 'field2']
 AnyMeta.predicates.get = function get(thing_id, fields, lang, wikify, callback, errback) {
     // assume id is always given
     var parameters = [['id', thing_id]];
@@ -322,7 +309,7 @@ AnyMeta.predicates.get = function get(thing_id, fields, lang, wikify, callback, 
         fields = [fields];
     }
     for (var k in fields) {
-        parameters.push(['field[' + k + ']', fields[k]]); // not sure this is how the method takes an array of fields...
+        parameters.push(['field[' + k + ']', fields[k]]);
     }
     // just gave a callback
     if (arguments.length == 3 && arguments[2] instanceof Function) {
