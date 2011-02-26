@@ -418,11 +418,11 @@ AnyMeta.attachment.create = function create(data, mime, title, connect, modifier
 
 AnyMeta.query = {};
 // since the only difference between query.execute and query.search is the response formats, which we don't process, share a common base function
-AnyMeta.query.execute = AnyMeta.query.__prepManyParamMethod('GET', 'anymeta.query.execute');
-AnyMeta.query.search = AnyMeta.query.__prepManyParamMethod('GET', 'anymeta.query.search');
+AnyMeta.query.execute = AnyMeta.__prepManyParamMethod('GET', 'anymeta.query.execute');
+AnyMeta.query.search = AnyMeta.__prepManyParamMethod('GET', 'anymeta.query.search');
 
 AnyMeta.edge = {};
-AnyMeta.edge.add = AnyMeta.query.__prepManyParamMethod('POST', 'anymeta.edge.add');
+AnyMeta.edge.add = AnyMeta.__prepManyParamMethod('POST', 'anymeta.edge.add');
 // NOTE: the edge or object + predicate is accessed via the arguments variable
 AnyMeta.edge.remove = function remove(thing_id, callback, errback) {
   var parameters = [['id', thing_id]];
